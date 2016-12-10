@@ -84,4 +84,12 @@ public class CtCoordinator extends CtAuthenticated {
 	public int hashCode(){
 		return this.id.value.getValue().length() + super.hashCode();
 	}
+	
+	public String typeName() // new code
+	{
+		if (type == EtCoordinatorType.hospital)
+			return "hospital";
+		else
+			return "normal";
+	}
 }
