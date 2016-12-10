@@ -32,6 +32,7 @@ import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtLa
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtLogin;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtLongitude;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtPassword;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.EtCoordinatorType;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.EtCrisisStatus;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.EtCrisisType;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.DtDate;
@@ -343,15 +344,22 @@ public class DbCrises extends DbAbstract {
 					aCtCoordinator = new CtCoordinator();
 					//coordinator's id
 					DtCoordinatorID aId1 = new DtCoordinatorID(new PtString(
-							res.getString("coordiantor")));
+							res.getString("coordinator")));
 					//coordinator's login
 					DtLogin aLogin = new DtLogin(new PtString(
 							res.getString("login")));
 					//coordinator's pwd
 					DtPassword aPwd = new DtPassword(new PtString(
 							res.getString("pwd")));
+					//coordinator's type
+					String cType = res.getString("type");	 // NEW CODE!!!!!!!
+					EtCoordinatorType acType = null; // NEW CODE!!!!!!!
+					if(cType.equals(EtCoordinatorType.normal.name())) // NEW CODE!!!!!!!
+						acType = EtCoordinatorType.normal; // NEW CODE!!!!!!!
+					if(cType.equals(EtCoordinatorType.hospital.name())) // NEW CODE!!!!!!!
+						acType = EtCoordinatorType.hospital; // NEW CODE!!!!!!!
 
-					aCtCoordinator.init(aId1, aLogin, aPwd);
+					aCtCoordinator.init(aId1, aLogin, aPwd, acType); // NEW CODE!!!!!!!
 
 					//add instances to the hash
 					assCtCrisisCtCoordinator.put(aCtCrisis, aCtCoordinator);

@@ -26,6 +26,7 @@ import lu.uni.lassy.excalibur.examples.icrash.dev.controller.exceptions.ServerOf
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.environment.actors.ActAdministrator;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.design.JIntIsActor;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorID;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.EtCoordinatorType;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.PtBoolean;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.PtString;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.utils.Log4JUtils;
@@ -41,6 +42,7 @@ import javafx.event.EventHandler;
  */
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TableView;
@@ -219,7 +221,13 @@ public class ICrashAdminGUIController extends AbstractAuthGUIController {
 			anchrpnCoordinatorDetails.getChildren().remove(i);
 		TextField txtfldUserID = new TextField();
 		TextField txtfldUserName = new TextField();
-		PasswordField psswrdfldPassword = new PasswordField();
+		ComboBox<String> txtfldType = new ComboBox<String>(); // NEW CODE!!!
+		for (int i=0; i<EtCoordinatorType.values().length; i++) // NEW CODE!!!
+			txtfldType.getItems().add(EtCoordinatorType.values()[i].toString()); // NEW CODE!!!
+		//txtfldType.getItems().addAll(EtCoordinatorType.normal.name(), EtCoordinatorType.hospital.name()); // NEW CODE!!!
+		txtfldType.setEditable(true); // NEW CODE!!!
+		txtfldType.setPromptText(EtCoordinatorType.normal.name()); // NEW CODE!!!
+		PasswordField psswrdfldPassword = new PasswordField(); 
 		txtfldUserID.setPromptText("User ID");
 		Button bttntypOK = null;
 		GridPane grdpn = new GridPane();
@@ -231,7 +239,8 @@ public class ICrashAdminGUIController extends AbstractAuthGUIController {
 			psswrdfldPassword.setPromptText("Password");
 			grdpn.add(txtfldUserName, 1, 2);
 			grdpn.add(psswrdfldPassword, 1, 3);
-			grdpn.add(bttntypOK, 1, 4);
+			grdpn.add(txtfldType, 1,  4); // NEW CODE!!!
+			grdpn.add(bttntypOK, 1, 5);
 			break;
 		case Delete:
 			bttntypOK = new Button("Delete");
@@ -249,8 +258,10 @@ public class ICrashAdminGUIController extends AbstractAuthGUIController {
 						DtCoordinatorID coordID = new DtCoordinatorID(new PtString(txtfldUserID.getText()));
 						switch(type){
 						case Add:
-							if (userController.oeAddCoordinator(txtfldUserID.getText(), txtfldUserName.getText(), psswrdfldPassword.getText()).getValue()){
-								listOfOpenWindows.add(new CreateICrashCoordGUI(coordID, systemstateController.getActCoordinator(txtfldUserName.getText())));
+							if (userController.oeAddCoordinator(txtfldUserID.getText(), txtfldUserName.getText(), psswrdfldPassword.getText(), txtfldType.getValue().toString()).getValue()){ // NEW CODE!!!
+								CreateICrashCoordGUI e = new CreateICrashCoordGUI(coordID, systemstateController.getActCoordinator(txtfldUserName.getText()));
+								e.setSysController(sysController);
+								listOfOpenWindows.add(e);
 								anchrpnCoordinatorDetails.getChildren().remove(grdpn);
 							}
 							else
@@ -380,6 +391,14 @@ public class ICrashAdminGUIController extends AbstractAuthGUIController {
 	}
 	
 	/* NEW CODE!!! */
+	
+	public void setSysController(SystemStateController sysc)
+	{
+		sysController = sysc;
+	}
+	
+	SystemStateController sysController;
+	
 	
 	  /** The button for picking the captcha case 0 */
     @FXML

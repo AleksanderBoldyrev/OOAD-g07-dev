@@ -23,6 +23,7 @@ import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.CtCo
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorID;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtLogin;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtPassword;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.EtCoordinatorType;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.PtBoolean;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.PtString;
 
@@ -51,11 +52,12 @@ public class DbCoordinators extends DbAbstract{
 				String id = aCtCoordinator.id.value.getValue();
 				String login =  aCtCoordinator.login.value.getValue();
 				String pwd =  aCtCoordinator.pwd.value.getValue();
-	
+				String type =  aCtCoordinator.type.name(); // NEW CODE!!!!!!!
 				log.debug("[DATABASE]-Insert coordinator");
-				int val = st.executeUpdate("INSERT INTO "+ dbName+ ".coordinators" +
-											"(id,login,pwd)" + 
-											"VALUES("+"'"+id+"'"+",'"+login+"','"+pwd+"')");
+				String sq = new String("INSERT INTO "+ dbName+ ".coordinators" +
+											"(id,login,pwd,type)" +  // NEW CODE!!!!!!!
+											"VALUES("+"'"+id+"'"+",'"+login+"','"+pwd+"', '"+type+"')");
+				int val = st.executeUpdate(sq); // NEW CODE!!!!!!!
 				
 				log.debug(val + " row affected");
 			}
@@ -106,8 +108,15 @@ public class DbCoordinators extends DbAbstract{
 					DtLogin aLogin = new DtLogin(new PtString(res.getString("login")));
 					//coordinator's pwd
 					DtPassword aPwd = new DtPassword(new PtString(res.getString("pwd")));
+					//coordinator's type
+					String theType = res.getString("type");  // NEW CODE!!!!!!!					
+					EtCoordinatorType aType = null; // NEW CODE!!!!!!!
+					if(theType.equals(EtCoordinatorType.normal.name())) // NEW CODE!!!!!!!
+						aType = EtCoordinatorType.normal; // NEW CODE!!!!!!!
+					if(theType.equals(EtCoordinatorType.hospital.name())) // NEW CODE!!!!!!!
+						aType = EtCoordinatorType.hospital; // NEW CODE!!!!!!!
 
-					aCtCoordinator.init(aId, aLogin,aPwd);
+					aCtCoordinator.init(aId, aLogin,aPwd, aType); // NEW CODE!!!!!!!
 					
 				}
 								
@@ -182,8 +191,9 @@ public class DbCoordinators extends DbAbstract{
 				String id = aCtCoordinator.id.value.getValue();
 				String login =  aCtCoordinator.login.value.getValue();
 				String pwd =  aCtCoordinator.pwd.value.getValue();
+				String type =  aCtCoordinator.type.name(); // NEW CODE!!!!!!!
 				String statement = "UPDATE "+ dbName+ ".coordinators" +
-						" SET pwd='"+pwd+"',  login='"+ login+"' " +
+						" SET pwd='"+pwd+"',  login='"+ login+"' " +"',  type='"+ type+"' "+ // NEW CODE!!!!!!!
 						"WHERE id='"+id+"'";
 				int val = st.executeUpdate(statement);
 				log.debug(val+" row updated");
@@ -232,8 +242,15 @@ public class DbCoordinators extends DbAbstract{
 							res.getString("id")));
 					DtLogin aLogin = new DtLogin(new PtString(res.getString("login")));
 					DtPassword aPwd = new DtPassword(new PtString(res.getString("pwd")));
+					//coordinator's type
+					String theType = res.getString("type");	 // NEW CODE!!!!!!!
+					EtCoordinatorType aType = null; // NEW CODE!!!!!!!
+					if(theType.equals(EtCoordinatorType.normal.name())) // NEW CODE!!!!!!!
+						aType = EtCoordinatorType.normal; // NEW CODE!!!!!!!
+					if(theType.equals(EtCoordinatorType.hospital.name())) // NEW CODE!!!!!!!
+						aType = EtCoordinatorType.hospital; // NEW CODE!!!!!!!
 					//init aCtAlert instance
-					aCtCoord.init(aId, aLogin, aPwd);
+					aCtCoord.init(aId, aLogin,aPwd, aType); // NEW CODE!!!!!!!
 					
 					//add instance to the hash
 					cmpSystemCtCoord

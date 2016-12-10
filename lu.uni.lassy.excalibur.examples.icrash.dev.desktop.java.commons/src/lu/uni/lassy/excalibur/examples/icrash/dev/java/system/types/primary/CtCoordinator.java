@@ -25,18 +25,23 @@ public class CtCoordinator extends CtAuthenticated {
 
 	/** The id of the coordinator. */
 	public DtCoordinatorID id;
-		
+	
+	/** The type of person the coordinators are. */
+	public EtCoordinatorType type; // NEW CODE!!!!!!!
+	
 	/**
 	 * Initialises the coordinator.
 	 *
 	 * @param aId The ID of the coordinator
 	 * @param aLogin The username of the coordinator
 	 * @param aPwd The password of the coordinator
+	 * @param aType The type of the coordinator
 	 * @return The success of the initialisation
 	 */
-	public PtBoolean init(DtCoordinatorID aId,DtLogin aLogin,DtPassword aPwd){
+	public PtBoolean init(DtCoordinatorID aId,DtLogin aLogin,DtPassword aPwd, EtCoordinatorType aType){
 			super.init(aLogin, aPwd);
 			id = aId;
+			type = aType; // NEW CODE
 			return new PtBoolean(true); 
 	}
 	
@@ -45,11 +50,13 @@ public class CtCoordinator extends CtAuthenticated {
 	 *
 	 * @param aLogin The value to change the login to
 	 * @param aPwd the value to change the password to 
+	 * @param aType The type of the coordinator
 	 * @return the success of the update method
 	 */
-	public PtBoolean update(DtLogin aLogin,DtPassword aPwd){
+	public PtBoolean update(DtLogin aLogin,DtPassword aPwd, EtCoordinatorType aType){
 		login = aLogin;
 		pwd = aPwd;
+		type = aType; // NEW CODE
 		return new PtBoolean(true);
 	}
 	
@@ -64,6 +71,8 @@ public class CtCoordinator extends CtAuthenticated {
 			return false;
 		CtCoordinator aCtCoordinator = (CtCoordinator)obj;
 		if (!aCtCoordinator.id.value.getValue().equals(this.id.value.getValue()))
+			return false;
+		if (!aCtCoordinator.type.equals(this.type)) // NEW CODE
 			return false;
 		return true;
 	}

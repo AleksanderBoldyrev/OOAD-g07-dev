@@ -12,12 +12,17 @@
  ******************************************************************************/
 package lu.uni.lassy.excalibur.examples.icrash.dev.view.gui.admin;
 import java.net.URL;
+import java.util.ArrayList;
 
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import lu.uni.lassy.excalibur.examples.icrash.dev.controller.SystemStateController;
+import lu.uni.lassy.excalibur.examples.icrash.dev.controller.exceptions.ServerNotBoundException;
+import lu.uni.lassy.excalibur.examples.icrash.dev.controller.exceptions.ServerOfflineException;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.environment.actors.ActAdministrator;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.CtCoordinator;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.utils.Log4JUtils;
 import lu.uni.lassy.excalibur.examples.icrash.dev.view.gui.abstractgui.CreatedWindows;
 import javafx.fxml.FXMLLoader;
@@ -28,6 +33,15 @@ import javafx.scene.Scene;
  * The Class CreateICrashAdminGUI that deals with starting up the Admin iCrashSystem.
  */
 public class CreateICrashAdminGUI implements CreatedWindows {
+	
+	// new code
+	public void setSysController(SystemStateController sysc)
+	{
+		sysController = sysc;
+	}
+	
+	SystemStateController sysController;
+	// ~new code
 	
 	/**
 	 * Generates and shows the window on the screen

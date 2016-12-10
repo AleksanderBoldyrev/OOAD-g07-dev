@@ -37,6 +37,7 @@ import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtLo
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtPassword;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtPhoneNumber;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.EtAlertStatus;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.EtCoordinatorType;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.EtCrisisStatus;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.EtCrisisType;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.EtHumanKind;
@@ -345,15 +346,16 @@ public interface IcrashSystem extends Remote {
 	 * @param aDtCoordinatorID The ID to create the coordinator with
 	 * @param aDtLogin The username of the coordinator to create
 	 * @param aDtPassword The password of the coordinator to create
+	 * @param aEtCoordType The type of the coordinator to create
 	 * @return The success of the method
 	 * @throws RemoteException Thrown if the server is offline
 	 */
-	public PtBoolean oeAddCoordinator(DtCoordinatorID aDtCoordinatorID,DtLogin aDtLogin,DtPassword aDtPassword) throws RemoteException; 	
+	public PtBoolean oeAddCoordinator(DtCoordinatorID aDtCoordinatorID,DtLogin aDtLogin,DtPassword aDtPassword, EtCoordinatorType aEtCoordType) throws RemoteException; 	
 	
 	/**
 	 * Deletes a coordinator with the details specified.
 	 *
-	 * @param aDtCoordinatorID The coordiantor ID to delete from the system
+	 * @param aDtCoordinatorID The coordinôtor ID to delete from the system
 	 * @return The success of the method
 	 * @throws RemoteException Thrown if the server is offline
 	 */

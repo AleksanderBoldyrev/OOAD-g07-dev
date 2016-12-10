@@ -64,7 +64,7 @@ public class CtHuman implements Serializable {
 	 * @return the success of the method
 	 * @throws RemoteException Thrown if the server is offline
 	 */
-	public PtBoolean isAcknowledged() throws RemoteException {
+	public PtBoolean isAcknowledged(String text) throws RemoteException { // new code
 
 		Logger log = Log4JUtils.getInstance().getLogger();
 		try{
@@ -72,7 +72,9 @@ public class CtHuman implements Serializable {
 	        IcrashSystem iCrashSys_Server = (IcrashSystem)registry.lookup("iCrashServer");
 			ActComCompany theComCompany = iCrashSys_Server.getActComCompany(this);
 			if(theComCompany != null){
-				DtSMS sms = new DtSMS(new PtString("The handling of your alert by our services is in progress !"));
+				DtSMS sms;
+				if (text.length()>0) sms = new DtSMS(new PtString("The handling of your alert by our services is in progress!"+text));
+				else sms = new DtSMS(new PtString("The handling of your alert by our services is in progress !"));
 				return theComCompany.ieSmsSend(this.id, sms);
 			} else
 				throw new Exception("No com company assigned to the human " + this.id.value.getValue());

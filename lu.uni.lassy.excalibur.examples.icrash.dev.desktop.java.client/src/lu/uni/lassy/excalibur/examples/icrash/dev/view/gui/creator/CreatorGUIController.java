@@ -39,6 +39,7 @@ import lu.uni.lassy.excalibur.examples.icrash.dev.view.gui.abstractgui.CreatedWi
 import lu.uni.lassy.excalibur.examples.icrash.dev.view.gui.activator.CreateActivatorGUI;
 import lu.uni.lassy.excalibur.examples.icrash.dev.view.gui.admin.CreateICrashAdminGUI;
 import lu.uni.lassy.excalibur.examples.icrash.dev.view.gui.comcompany.CreateICrashComCompany;
+import lu.uni.lassy.excalibur.examples.icrash.dev.view.gui.coordinator.CreateICrashCoordGUI;
 import lu.uni.lassy.excalibur.examples.icrash.dev.view.gui.monitor.CreateMonitor;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -91,7 +92,13 @@ public class CreatorGUIController extends AbstractGUIController{
 						Screen screen = Screen.getPrimary();
 						Rectangle2D bounds = screen.getVisualBounds();
 						double rangeY = bounds.getMaxY() - bounds.getMinY();
-						listOfWindows.add(new CreateICrashAdminGUI(systemStatecontroller.getActAdministrator(), bounds.getMinX(), bounds.getMinY()));
+						CreateICrashAdminGUI e= new CreateICrashAdminGUI(systemStatecontroller.getActAdministrator(), bounds.getMinX(), bounds.getMinY());
+						e.setSysController(systemStatecontroller);
+						listOfWindows.add(e);
+						// new code
+						listOfWindows.add(new CreateICrashCoordGUI(systemStatecontroller));
+						//anchrpnCoordinatorDetails.getChildren().remove(grdpn);
+						// end of new code
 						double percent = 0.1;
 						//Dealing with com company window placement
 						ArrayList<ActComCompany> listOfComCompanies = systemStatecontroller.getActComCompany();

@@ -19,6 +19,7 @@ import java.util.ResourceBundle;
 
 import javafx.util.Callback;
 import lu.uni.lassy.excalibur.examples.icrash.dev.controller.CoordinatorController;
+import lu.uni.lassy.excalibur.examples.icrash.dev.controller.SystemStateController;
 import lu.uni.lassy.excalibur.examples.icrash.dev.controller.exceptions.IncorrectActorException;
 import lu.uni.lassy.excalibur.examples.icrash.dev.controller.exceptions.IncorrectFormatException;
 import lu.uni.lassy.excalibur.examples.icrash.dev.controller.exceptions.ServerNotBoundException;
@@ -28,9 +29,12 @@ import lu.uni.lassy.excalibur.examples.icrash.dev.java.environment.actors.ActPro
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.design.JIntIsActor;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.CtAlert;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.CtCrisis;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorID;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.EtAlertStatus;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.EtCoordinatorType;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.EtCrisisStatus;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.PtBoolean;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.PtString;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.utils.Log4JUtils;
 import lu.uni.lassy.excalibur.examples.icrash.dev.model.Message;
 import lu.uni.lassy.excalibur.examples.icrash.dev.model.actors.ActProxyCoordinatorImpl;
@@ -38,6 +42,7 @@ import lu.uni.lassy.excalibur.examples.icrash.dev.view.gui.abstractgui.AbstractA
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 import javafx.beans.value.ChangeListener;
@@ -449,20 +454,40 @@ public class ICrashCoordGUIController extends AbstractAuthGUIController {
 	 */
 	@Override
 	public void logon() {
+		loginsCount++; // user code
 		if(txtfldCoordLogonUserName.getText().length() > 0 && psswrdfldCoordLogonPassword.getText().length() > 0){
 			try {
-				if (userController.oeLogin(txtfldCoordLogonUserName.getText(), psswrdfldCoordLogonPassword.getText()).getValue()){
-					if (userController.getUserType() == UserType.Coordinator){
-						logonShowPanes(true);
+				// user code
+				String login = txtfldCoordLogonUserName.getText();
+				String passw = psswrdfldCoordLogonPassword.getText();
+				//if (userController==null)
+				//{
+					if (gui!=null)
+					{
+						ActCoordinator ac = gui.getContrl(login);
+						if (ac!=null)
+						{
+							userController = new CoordinatorController(ac);
+							this.setActor(ac);
+						}
 					}
+				//}
+				if (userController!=null)
+					if (userController.oeLogin(passw, passw).getValue()){
+						if (userController.getUserType() == UserType.Coordinator){
+							logonShowPanes(true);
+							loginsCount = 0;
+						}
 				}
 			}
-			catch (ServerOfflineException | ServerNotBoundException e) {
+			catch (ServerOfflineException | ServerNotBoundException | RemoteException | NotBoundException e) {
 				showExceptionErrorMessage(e);
 			}
     	}
     	else
     		showWarningNoDataEntered();
+		if (loginsCountToShowCaptcha<=loginsCount) // user code
+			showCaptcha(); // user code
 	}
 
 	/* (non-Javadoc)
@@ -488,7 +513,18 @@ public class ICrashCoordGUIController extends AbstractAuthGUIController {
 		pnLogon.setVisible(!loggedOn);
 		bttnCoordLogon.setDefaultButton(!loggedOn);
 		if (loggedOn){
-			tbpnMain.getSelectionModel().selectFirst();
+			// new code
+			if (gui.getCoordType()==EtCoordinatorType.hospital) {
+				tbCoordAlerts.setDisable(true);
+				tbpnMain.getSelectionModel().selectLast();
+				bttnReportCrisis.setDisable(true);
+			}
+			else {
+				tbpnMain.getSelectionModel().selectFirst();
+				tbCoordAlerts.setDisable(false);
+			}
+			// end of new code
+			//tbpnMain.getSelectionModel().selectFirst();
 			cmbbxAlertStatus.setValue(EtAlertStatus.pending);
 			cmbbxCrisisStatus.setValue(EtCrisisStatus.pending);
 		}
@@ -506,7 +542,8 @@ public class ICrashCoordGUIController extends AbstractAuthGUIController {
 	@Override
 	public void closeForm() {
 		try {
-			userController.removeAllListeners();
+			if (userController!=null)
+				userController.removeAllListeners();
 		} catch (ServerOfflineException | ServerNotBoundException e) {
 			showExceptionErrorMessage(e);
 		}
@@ -537,6 +574,13 @@ public class ICrashCoordGUIController extends AbstractAuthGUIController {
 			}
 		});
 		logonShowPanes(false);
+		
+		/* User code! */
+		capLabel.setVisible(false);
+		capButton0.setVisible(false);
+		capButton1.setVisible(false);
+		capButton2.setVisible(false);
+		/* End of user code! */
 	}
 
 	@Override
@@ -588,4 +632,134 @@ public class ICrashCoordGUIController extends AbstractAuthGUIController {
 		}
 		return new PtBoolean(true);
 	}
+	
+	/* NEW CODE!!! */
+	
+	  /** The button for picking the captcha case 0 */
+  @FXML
+  private Button capButton0;
+
+  /** The button for picking the captcha case 1 */    
+  @FXML
+  private Button capButton1;
+
+  /** The button for picking the captcha case 2 */
+  @FXML
+  private Button capButton2;
+
+  /** The captcha case label */
+  @FXML
+  private Label capLabel;
+  
+  /** Captcha data variables*/
+  /** dd */
+  private int loginsCount = 0;
+  /** dd */
+  private int capButtonId = 0;
+  /** dd */ 
+  private final int loginsCountToShowCaptcha = 3;
+  /** dd */
+  private final String labelText = "Please, press button #";	
+  
+	/** Function for manipulating login button and captcha panel*/
+	private void showCaptcha()
+	{
+		bttnCoordLogon.setVisible(false);
+		capLabel.setVisible(true);
+		capButton0.setVisible(true);
+		capButton1.setVisible(true);
+		capButton2.setVisible(true);
+		
+		capButtonId = (int)(Math.random()*100 % 10);
+		int tempV1 = capButtonId;
+		while (tempV1==capButtonId)
+		{
+			tempV1 = (int)(Math.random()*100 % 10);
+		}
+		int tempV2 = capButtonId;
+		while (tempV2==capButtonId || (tempV2==tempV1))
+		{
+			tempV2 = (int)(Math.random()*100 % 10);
+		}
+		int tempPos = (int)(Math.random()*100 % 3);
+		if (tempPos == 0)
+		{
+			capButton0.setText(Integer.toString(capButtonId));
+			capButton1.setText(Integer.toString(tempV1));
+			capButton2.setText(Integer.toString(tempV2));
+		}
+		else if (tempPos == 1)
+		{
+			capButton0.setText(Integer.toString(tempV1));
+			capButton1.setText(Integer.toString(capButtonId));
+			capButton2.setText(Integer.toString(tempV2));
+		}
+		else if (tempPos == 2)
+		{
+			capButton0.setText(Integer.toString(tempV1));
+			capButton1.setText(Integer.toString(tempV2));
+			capButton2.setText(Integer.toString(capButtonId));
+		}
+		capLabel.setText(labelText+Integer.toString(capButtonId));
+	}
+	
+	 /**
+   * The captcha button 0 event
+   *
+   * @param event The event type thrown, we do not need this, but it must be specified
+   */
+  @FXML
+  void cap2Button0_click(ActionEvent event) {
+  	checkCaptcha(Integer.parseInt(capButton0.getText()));
+  }
+  
+	 /**
+   * The captcha button 1 event
+   *
+   * @param event The event type thrown, we do not need this, but it must be specified
+   */
+  @FXML
+  void cap2Button1_click(ActionEvent event) {
+  	checkCaptcha(Integer.parseInt(capButton1.getText()));
+  }
+  
+	 /**
+   * The captcha button 2 event
+   *
+   * @param event The event type thrown, we do not need this, but it must be specified
+   */
+  @FXML
+  void cap2Button2_click(ActionEvent event) {
+  	checkCaptcha(Integer.parseInt(capButton2.getText()));
+  }
+  
+  private void checkCaptcha(int val)
+  {
+  	if (val == capButtonId)
+  	{
+  		bttnCoordLogon.setVisible(true);
+  		capLabel.setVisible(false);
+  		capButton0.setVisible(false);
+  		capButton1.setVisible(false);
+  		capButton2.setVisible(false);
+  		loginsCount = 0;
+  	}
+  	else showCaptcha();
+  	
+  }
+
+//public void setSysController(SystemStateController sysController) {
+	// TODO Auto-generated method stub
+//	sysStateController = sysController;
+//}
+
+//private SystemStateController sysStateController;
+
+public void setGUI(CreateICrashCoordGUI ui)
+{
+	gui = ui;
+}
+
+private CreateICrashCoordGUI gui;
+
 }
